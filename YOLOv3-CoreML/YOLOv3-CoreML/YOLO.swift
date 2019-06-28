@@ -30,15 +30,15 @@ class YOLO {
   }
 
   public func computeBoundingBoxes(features: [MLMultiArray]) -> [Prediction] {
-    assert(features[0].count == 255*13*13)
-    assert(features[1].count == 255*26*26)
+    assert(features[0].count == 18*13*13)
+    assert(features[1].count == 18*26*26)
     assert(features[2].count == 255*52*52)
 
     var predictions = [Prediction]()
 
     let blockSize: Float = 32
     let boxesPerCell = 3
-    let numClasses = 80
+    let numClasses = 1
 
     // The 416x416 image is divided into a 13x13 grid. Each of these grid cells
     // will predict 5 bounding boxes (boxesPerCell). A bounding box consists of
