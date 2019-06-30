@@ -24,6 +24,9 @@ class ViewController: UIViewController {
   var framesDone = 0
   var frameCapturingStartTime = CACurrentMediaTime()
   let semaphore = DispatchSemaphore(value: 2)
+    
+  //Josh - creating a global image var so that it can be referenced by cropImage() in show()
+  var frameUIImage: UIImage? = nil
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -126,6 +129,9 @@ class ViewController: UIViewController {
   // MARK: - Doing inference
 
   func predict(image: UIImage) {
+    //Josh - setting the frameUIImage as the frame currenlty getting predicted
+    frameUIImage = image
+    
     if let pixelBuffer = image.pixelBuffer(width: YOLO.inputWidth, height: YOLO.inputHeight) {
       predict(pixelBuffer: pixelBuffer)
     }
@@ -228,7 +234,14 @@ class ViewController: UIViewController {
         rect.origin.y += top
         rect.size.width *= scaleX
         rect.size.height *= scaleY
-
+        
+        //Josh - I think this is where we use the newly scalled rect to crop the image (where do we get the image from?)
+        // and then pass in that image as input to the classification model.
+        //Once we get a classification for the shoe, we display the bounding box with the code below, but we pass in the
+        // label from the classifcation model as the 'label' for the box instead of the label from YOLO
+        let croppedImage = cropImage(inputImage: frameUIImage!, cropX: rect.origin.x, cropY: rect.origin.y, cropWidth: rect.size.width, cropHeight: rect.size.height)
+        //TODO: pass croppedImage into the shoe classifier model
+        
         // Show the bounding box.
         let label = String(format: "%@ %.1f", labels[prediction.classIndex], prediction.score * 100)
         let color = colors[prediction.classIndex]
@@ -258,3 +271,19 @@ extension ViewController: VideoCaptureDelegate {
     }
   }
 }
+
+/* Josh - my understanding of the logic flow:
+ App Start:
+  ViewDidLoad() sets everything up so that the camera and model are ready to make predictions and the bounding box stuff is queued up
+      Amoung other things, this function ultimately calls ShowOnMainThread, which is responsible for showing the bounding boxes and prediciton result
+          However when ShowOnMainThread is called the first time (by calls from ViewDidLoad()) then it is passed empty data so nothing should be shown
+ Prediction:
+  Something calls the Predict(UIImage) method. No idea what makes that call but it supposedly happens
+    Predict() calls YOLO.predict() and then passes the output of this function (a series of BoundingBox objects) into the ShowOnMainThread() funciton
+    Now that real data is passed into ShowOnMainThread, it will display the bounding boxes passed into it, along with the label from Yolo
+ 
+    FinishLine modification: We need to intercept the ShowOnMainThread() funciton after the bounding boxes are scaled to the size of the frame,
+      but before the bounding boxes are displayed on the screen. We need to take the scalled bounding boxes and use them to crop the original frame
+      and then pass in the cropped image to our shoe classifer model, which will return a label. We can then use this as the label to show on the
+      bounding box instead of the label that came from the YOLO detection.
+ */
