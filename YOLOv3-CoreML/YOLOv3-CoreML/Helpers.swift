@@ -142,3 +142,18 @@ public func softmax(_ x: [Float]) -> [Float] {
 
   return x
 }
+
+//Josh - Crop a UIImage according to the coordinates passed in
+// Inputs: the UIImage, the x,y coordinates of the center of the bounding box, and the width and height of the bounding box
+public func cropImage (inputImage: UIImage, cropX: CGFloat, cropY: CGFloat, cropWidth: CGFloat, cropHeight: CGFloat) -> UIImage? {
+    let cgImage = inputImage.cgImage!
+    let cropRect: CGRect = CGRect(x: cropX, y: cropY, width: cropWidth, height: cropHeight)
+    
+    // Create bitmap image from context using the rect
+    guard let imageRef: CGImage = cgImage.cropping(to: cropRect) else { return nil }
+    
+    // Create a new image based on the imageRef and rotate back to the original orientation
+    let outputImage: UIImage = UIImage(cgImage: imageRef, scale: inputImage.scale, orientation: inputImage.imageOrientation)
+    
+    return outputImage
+}
