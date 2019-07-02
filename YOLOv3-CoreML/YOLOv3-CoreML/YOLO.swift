@@ -8,8 +8,8 @@ class YOLO {
   public static let maxBoundingBoxes = 10
 
   // Tweak these values to get more or fewer predictions.
-  let confidenceThreshold: Float = 0.6
-  let iouThreshold: Float = 0.5
+  let confidenceThreshold: Float = 0
+  let iouThreshold: Float = 0
 
   struct Prediction {
     let classIndex: Int
@@ -32,7 +32,7 @@ class YOLO {
   public func computeBoundingBoxes(features: [MLMultiArray]) -> [Prediction] {
     assert(features[0].count == 18*13*13)
     assert(features[1].count == 18*26*26)
-    assert(features[2].count == 255*52*52)
+    assert(features[2].count == 18*52*52)
 
     var predictions = [Prediction]()
 
