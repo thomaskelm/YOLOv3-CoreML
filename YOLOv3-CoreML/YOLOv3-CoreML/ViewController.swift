@@ -239,7 +239,9 @@ class ViewController: UIViewController {
         // and then pass in that image as input to the classification model.
         //Once we get a classification for the shoe, we display the bounding box with the code below, but we pass in the
         // label from the classifcation model as the 'label' for the box instead of the label from YOLO
-        let croppedImage = cropImage(inputImage: frameUIImage!, cropX: rect.origin.x, cropY: rect.origin.y, cropWidth: rect.size.width, cropHeight: rect.size.height)
+        
+        //let croppedImage = cropImage(inputImage: frameUIImage!, cropX: rect.origin.x, cropY: rect.origin.y, cropWidth: rect.size.width, cropHeight: rect.size.height)
+        
         //TODO: pass croppedImage into the shoe classifier model
         
         // Show the bounding box.
